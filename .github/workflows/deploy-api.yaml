@@ -2,6 +2,13 @@ name: Deploy API
 
 on:
   workflow_call:
+    inputs:
+      image-name:
+        required: true
+        type: string
+      image-tag:
+        required: true
+        type: string
 
     secrets:
       DOCKER_USERNAME:
@@ -25,5 +32,11 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/mi-api:latest .
-          docker push ${{ secrets.DOCKER_USERNAME }}/mi-api:latest
+          IMAGE="${{ secrets.DOCKER_USERNAME }}/${{ inputs.image-name }}"
+
+          docker build \
+            -t "$IMAGE:${{ inputs.image-tag }}" \
+            -t "$IMAGE:latest" \
+            .
+
+          docker push --all-tags "$IMAGE"
