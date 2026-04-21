@@ -9,7 +9,6 @@ on:
       image-tag:
         required: true
         type: string
-
     secrets:
       DOCKER_USERNAME:
         required: true
@@ -27,6 +26,7 @@ on:
 
 jobs:
   deps-and-test:
+    name: Install & Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,9 +34,9 @@ jobs:
       - run: npm test
 
   build-and-push:
+    name: Build & Push Docker
     needs: deps-and-test
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -49,10 +49,8 @@ jobs:
       - name: Build & Push
         run: |
           IMAGE="${{ secrets.DOCKER_USERNAME }}/${{ inputs.image-name }}"
-
           docker build \
             -t "$IMAGE:${{ inputs.image-tag }}" \
             -t "$IMAGE:latest" \
             .
-
           docker push --all-tags "$IMAGE"
